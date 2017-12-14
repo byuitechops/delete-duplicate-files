@@ -15,7 +15,7 @@ module.exports = (course, stepCallback) => {
         if (err) course.throwErr('delete-duplicate-files', err);
         else {
             asyncLib.each(canvasFiles, (canvasFile, eachCb) => {
-                if (usedFileNames.includes(canvasFile.display_name)) {
+                if (course.info.usedFiles.includes(canvasFile.display_name)) {
                     canvas.delete(`/api/v1/files/${canvasFile.id}`, (deleteErr) => {
                         if (deleteErr) course.throwErr('delete-duplicate-files', `${canvasFile.display_name} listed as a used file, but the tool failed to delete its duplicate. Does it exist in canvas?`);
                         else {

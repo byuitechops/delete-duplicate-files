@@ -17,16 +17,24 @@ module.exports = (course, stepCallback) => {
             asyncLib.each(canvasFiles, (canvasFile, eachCb) => {
                 if (course.info.usedFiles.includes(canvasFile.display_name)) {
                     canvas.delete(`/api/v1/files/${canvasFile.id}`, (deleteErr) => {
-                        if (deleteErr) course.throwErr('delete-duplicate-files', `${canvasFile.display_name} listed as a used file, but the tool failed to delete its duplicate. Does it exist in canvas?`);
-                        else {
-                            course.success('delete-duplicate-files', `${canvasFile.display_name} has been deleted from canvas files.`);
+                        if (deleteErr) {
+                            course.throwErr('delete-duplicate-files',
+                                `${canvasFile.display_name} listed as a used file, but the tool failed to delete its duplicate. Does it exist in canvas?`
+                            );
+                            eachCb(null);
+                        } else {
+                            course.success('delete-duplicate-files',
+                                `${canvasFile.display_name} has been deleted from canvas files.`
+                            );
                             eachCb(null);
                         }
                     });
                 }
             }, (err) => {
-                if (err) course.throwErr('delete-duplicate-files', err);
-                else {
+                if (err) {
+                    course.throwErr('delete-duplicate-files', err);
+                    stepCallback(null, course);
+                } else {
                     course.success('delete-duplicate-files', `All duplicate files deleted.`);
                     stepCallback(null, course);
                 }

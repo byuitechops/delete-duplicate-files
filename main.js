@@ -29,6 +29,8 @@ module.exports = (course, stepCallback) => {
                             eachCb(null);
                         }
                     });
+                } else {
+                    eachCb(null);
                 }
             }, (err) => {
                 if (err) {

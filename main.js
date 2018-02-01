@@ -9,23 +9,21 @@ const path = require('path');
 const asyncLib = require('async');
 
 module.exports = (course, stepCallback) => {
-    course.addModuleReport('delete-duplicate-files');
 
     canvas.get(`/api/v1/courses/${course.info.canvasOU}/files?search_term=html`, (err, canvasFiles) => {
-        if (err) course.throwErr('delete-duplicate-files', err);
+        if (err) course.error(err);
         else {
             asyncLib.each(canvasFiles, (canvasFile, eachCb) => {
                 if (course.info.usedFiles.includes(canvasFile.display_name)) {
                     canvas.delete(`/api/v1/files/${canvasFile.id}`, (deleteErr) => {
                         if (deleteErr) {
-                            course.throwErr('delete-duplicate-files',
-                                `${canvasFile.display_name} listed as a used file, but the tool failed to delete its duplicate. Does it exist in canvas?`
-                            );
+                            course.error(new Error(`${canvasFile.display_name} listed as a used file, but the tool failed to delete its duplicate. Does it exist in canvas?`));
                             eachCb(null);
                         } else {
-                            course.success('delete-duplicate-files',
-                                `${canvasFile.display_name} has been deleted from canvas files.`
-                            );
+                            course.log('Deleted Files', {
+                                'Name': canvasFile.display_name,
+                                'ID': canvasFile.id
+                            });
                             eachCb(null);
                         }
                     });
@@ -34,10 +32,10 @@ module.exports = (course, stepCallback) => {
                 }
             }, (err) => {
                 if (err) {
-                    course.throwErr('delete-duplicate-files', err);
+                    course.error(err);
                     stepCallback(null, course);
                 } else {
-                    course.success('delete-duplicate-files', `All duplicate files deleted.`);
+                    course.message('All duplicate files have been deleted');
                     stepCallback(null, course);
                 }
             });

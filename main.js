@@ -5,7 +5,6 @@
 
 /* Put dependencies here */
 const canvas = require('canvas-wrapper');
-const path = require('path');
 const asyncLib = require('async');
 
 module.exports = (course, stepCallback) => {
